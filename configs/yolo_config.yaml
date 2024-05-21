@@ -1,0 +1,17 @@
+# Train/val/test sets as 1) dir: path/to/imgs, 2) file: path/to/imgs.txt, or 3) list: [path/to/imgs1, path/to/imgs2, ..]
+path: /scratch/hekalo/Datasets/vindr/  # dataset root dir
+train: png/train
+val: png/val
+test: png/test
+
+# Classes
+names:
+  0: Cardiomegaly
+  1: Aortic enlargement
+  2: Pleural thickening
+  3: ILD
+  4: Nodule/Mass
+  5: Pulmonary fibrosis
+  6: Lung Opacity
+  7: Atelectasis
+  8: Other lesion

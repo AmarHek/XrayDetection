@@ -110,7 +110,7 @@ def preprocess_annotations(annotations_file, dicom_path, output_path):
 
 if __name__ == "__main__":
     ann_file = "/scratch/hekalo/Datasets/vindr/annotations.csv"
-    dcm_path = "/scratch/hekalo/Datasets/vindr/dicom/"
+    dcm_path = "/scratch/hekalo/Datasets/vindr/dicom/train/"
     annotations_path = "/scratch/hekalo/Datasets/vindr/annotations/"
 
     preprocess_annotations(ann_file, dcm_path, annotations_path)

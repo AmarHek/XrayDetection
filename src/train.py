@@ -31,7 +31,7 @@ ERASING = 0.05
 CROP_FRACTION = 0.9
 
 
-config_path = "~Git/xraydetection/configs/"
+config_path = "~/Git/xraydetection/configs/"
 data_config = os.path.join(config_path, "data.yaml")
 
 # Load the model

@@ -97,7 +97,7 @@ def preprocess_annotations(annotations_file, dicom_path, output_path):
     # iterate over the grouped data
     for image_id, annotations in tqdm(grouped_data):
         # get the dicom image
-        dicom_image = os.path.join(dicom_path, f"{image_id}.dcm")
+        dicom_image = os.path.join(dicom_path, f"{image_id}.dicom")
         dicom = pydicom.dcmread(dicom_image)
         image_height, image_width = dicom.pixel_array.shape
 

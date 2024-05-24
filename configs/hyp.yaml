@@ -1,0 +1,42 @@
+# Hyperparameters for training
+
+# Misc
+plots: True            # Save plots
+val: True              # Do validation
+freeze: None           # Freeze backbone at this layer
+dropout: 0.0           # Dropout
+
+# Learning Rate and Optimization
+lr0: 0.01              # Initial learning rate
+lrf: 0.01              # Final learning rate fraction (final_lr = lr0 * lrf)
+momentum: 0.937        # SGD momentum
+weight_decay: 0.0005   # Optimizer weight decay
+warmup_epochs: 3.0     # Number of warmup epochs
+warmup_momentum: 0.8   # Warmup momentum
+warmup_bias_lr: 0.1    # Warmup initial learning rate for bias parameters
+
+# Loss Function
+box: 0.5               # Box loss gain
+cls: 0.5               # Class loss gain
+cls_pw: 1.0            # Class loss positive weight
+obj: 1.0               # Object loss gain (scale factor for objectness loss)
+obj_pw: 1.0            # Object loss positive weight
+iou_t: 0.20            # IoU training threshold (minimum IoU to consider a positive detection)
+anchor_t: 4.0          # Anchor-matching threshold (used during training to match anchors to ground truth boxes)
+fl_gamma: 0.0          # Focal Loss gamma (if > 0, uses Focal Loss to down-weight easy examples and focus training on hard negatives)
+
+# Data Augmentation
+hsv_h: 0.000           # HSV-Hue augmentation fraction
+hsv_s: 0.000           # HSV-Saturation augmentation fraction
+hsv_v: 0.000           # HSV-Value augmentation fraction
+degrees: 10.0          # Rotation augmentation degrees (range of random rotation)
+translate: 0.1         # Translation augmentation fraction (range of random translation)
+scale: 0.05            # Scale augmentation fraction (range of random scaling)
+shear: 0.0             # Shear augmentation degrees (range of random shear)
+perspective: 0.0       # Perspective augmentation fraction (range of random perspective transformation)
+flipud: 0.0            # Vertical flip probability (fraction of images to be flipped upside down)
+fliplr: 0.5            # Horizontal flip probability (fraction of images to be flipped left to right)
+mosaic: 1.0            # Mosaic augmentation probability (probability of applying mosaic augmentation)
+mixup: 0.0             # Mixup augmentation probability (probability of applying mixup augmentation)
+copy_paste: 0.0        # Copy-paste augmentation probability (probability of using copy-paste augmentation)
+crop_fraction: 0.90    # Fraction of image to crop (centered) for training

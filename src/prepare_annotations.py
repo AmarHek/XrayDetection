@@ -96,7 +96,6 @@ def preprocess_annotations(annotations_file, dicom_path, output_path):
 
     # iterate over the grouped data
     for image_id, annotations in tqdm(grouped_data):
-        print(annotations)
         # get the dicom image
         dicom_image = os.path.join(dicom_path, f"{image_id}.dicom")
         dicom = pydicom.dcmread(dicom_image)
@@ -104,7 +103,6 @@ def preprocess_annotations(annotations_file, dicom_path, output_path):
 
         # process the annotations
         yolo_annotations = vindr_to_yolo_format(annotations, image_width, image_height)
-        print(yolo_annotations)
 
         # save the annotations to a txt file
         save_to_txt(yolo_annotations, image_id, output_path)

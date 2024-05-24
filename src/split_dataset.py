@@ -64,8 +64,11 @@ def create_yolov8_dataset(png_path, annotations_path, output_path, train_ratio=0
         for image in images:
             image_id = os.path.basename(image).replace(".png", "")
             shutil.copy(image, os.path.join(output_path, "images", str(split), f"{image_id}.png"))
-            shutil.copy(os.path.join(annotations_path, f"{image_id}.txt"),
-                        os.path.join(output_path, "labels", str(split), f"{image_id}.txt"))
+            try:
+                shutil.copy(os.path.join(annotations_path, f"{image_id}.txt"),
+                            os.path.join(output_path, "labels", str(split), f"{image_id}.txt"))
+            except FileNotFoundError:
+                print(f"No annotations found for {image_id}. Skipping...")
 
 
 if __name__ == "__main__":

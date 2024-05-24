@@ -38,11 +38,11 @@ def vindr_to_yolo_format(annotations, image_width, image_height) -> pd.DataFrame
     height /= image_height
 
     return pd.DataFrame({
-        "class_id": [class_id],
-        "x_center": [x_center],
-        "y_center": [y_center],
-        "width": [width],
-        "height": [height]
+        "class_id": class_id,
+        "x_center": x_center,
+        "y_center": y_center,
+        "width": width,
+        "height": height
     })
 
 

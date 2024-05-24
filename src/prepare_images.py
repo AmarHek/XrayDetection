@@ -3,6 +3,7 @@ import os
 import cv2
 import numpy as np
 import pydicom
+import tqdm
 
 
 def shift_pixel_range(image, old_max, new_max=1.0):
@@ -85,15 +86,15 @@ def preprocess_dataset(dicom_root, png_root):
 
     # create the png root directory if it does not exist
     if not os.path.exists(png_root):
-        os.makedirs(png_root)
+        os.makedirs(png_root, exist_ok=True)
 
     # iterate over the dicom root directory
     for root, _, files in os.walk(dicom_root):
-        for file in files:
+        for file in tqdm.tqdm(files):
             # check if the file is a dicom file
-            if file.endswith(".dcm"):
+            if file.endswith(".dicom"):
                 dicom_path = os.path.join(root, file)
-                png_path = os.path.join(png_root, file.replace(".dcm", ".png"))
+                png_path = os.path.join(png_root, file.replace(".dicom", ".png"))
 
                 # preprocess the dicom image
                 image_preprocessing_pipeline(dicom_path, png_path)
@@ -102,4 +103,6 @@ def preprocess_dataset(dicom_root, png_root):
 if __name__ == "__main__":
     dicom_root = "/scratch/hekalo/Datasets/vindr/dicom/"
     png_root = "/scratch/hekalo/Datasets/vindr/png/"
+
+    preprocess_dataset(dicom_root, png_root)
 

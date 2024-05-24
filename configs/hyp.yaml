@@ -18,12 +18,8 @@ warmup_bias_lr: 0.1    # Warmup initial learning rate for bias parameters
 # Loss Function
 box: 0.5               # Box loss gain
 cls: 0.5               # Class loss gain
-cls_pw: 1.0            # Class loss positive weight
 obj: 1.0               # Object loss gain (scale factor for objectness loss)
-obj_pw: 1.0            # Object loss positive weight
 iou_t: 0.20            # IoU training threshold (minimum IoU to consider a positive detection)
-anchor_t: 4.0          # Anchor-matching threshold (used during training to match anchors to ground truth boxes)
-fl_gamma: 0.0          # Focal Loss gamma (if > 0, uses Focal Loss to down-weight easy examples and focus training on hard negatives)
 
 # Data Augmentation
 hsv_h: 0.000           # HSV-Hue augmentation fraction

@@ -36,8 +36,8 @@ FLIPLR = 0.5
 FLIPUP = 0.0
 MOSAIC = 0.0
 COPY_PASTE = 0.0
-ERASE = 0.1
-
+ERASING = 0.0
+CROP_FRACTION = 1.0
 
 config_path = os.path.join(os.getcwd(), "configs")
 data_config = os.path.join(config_path, "data.yaml")
@@ -56,4 +56,5 @@ results = model.train(data=data_config, device="cuda",
                       hsv_h=HSV_H, hsv_s=HSV_S, hsv_v=HSV_V,
                       degrees=DEGREES, translate=TRANSLATE, scale=SCALE, shear=SHEAR,
                       perspective=PERSPECTIVE, fliplr=FLIPLR, flipud=FLIPUP,
-                      mosaic=MOSAIC, copy_paste=COPY_PASTE, erase=ERASE)
+                      mosaic=MOSAIC, copy_paste=COPY_PASTE, erasing=ERASING,
+                      crop_fraction=CROP_FRACTION)

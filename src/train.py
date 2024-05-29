@@ -43,7 +43,8 @@ config_path = os.path.join(os.getcwd(), "configs")
 data_config = os.path.join(config_path, "data.yaml")
 
 # Load the model
-model = YOLO("yolov8m.pt")
+# model = YOLO("yolov8m.pt")
+model = YOLO("yolov8s.pt")
 
 # Display the model information
 model.info()

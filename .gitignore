@@ -2,3 +2,5 @@ venv/
 data-sample/
 .idea/
 *.png
+*.pt
+vindr_yolov8/

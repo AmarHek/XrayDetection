@@ -8,15 +8,15 @@ name = "initial_run"
 EPOCHS = 100
 IMG_SIZE = 640
 PATIENCE = 10
-BATCH_SIZE = 16
+BATCH_SIZE = 8
 SAVE = True
 LR0 = 0.01
 LRF = 0.01
 
 # Loss parameters
-BOX = 0.5
-CLS = 0.5
-IOU = 0.2
+#BOX = 0.5
+#CLS = 0.5
+#IOU = 0.2
 
 # Augmentation parameters
 HSV_H = 0
@@ -45,7 +45,7 @@ results = model.train(data=data_config,
                       device="cuda",
                       project=PROJECT, name=name, plots=True,
                       epochs=EPOCHS, batch=BATCH_SIZE, imgsz=IMG_SIZE, save=SAVE,
-                      box=BOX, cls=CLS, iou=IOU,
+                      # box=BOX, cls=CLS, iou=IOU,
                       patience=PATIENCE, lr0=LR0, lrf=LRF,
                       hsv_h=HSV_H, hsv_s=HSV_S, hsv_v=HSV_V,
                       degrees=DEGREES, translate=TRANSLATE, scale=SCALE,

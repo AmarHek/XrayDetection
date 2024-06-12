@@ -14,7 +14,7 @@ SAVE = True
 # lr scheduling parameters
 LR0 = 0.001
 LRF = 0.001
-WARMUP_EPOCHS = 5.0
+WARMUP_EPOCHS = 3.0
 WARMUP_MOMENTUM = 0.8
 WARMUP_BIAS_LR = 0.1
 

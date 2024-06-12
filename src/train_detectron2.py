@@ -19,9 +19,9 @@ WARMUP_MOMENTUM = 0.8
 WARMUP_BIAS_LR = 0.1
 
 # Loss parameters
-BOX = 0.05
+BOX = 5.0
 CLS = 0.5
-IOU = 0.5
+IOU = 0.7
 
 # Augmentation parameters
 HSV_H = 0.015

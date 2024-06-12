@@ -5,7 +5,7 @@ PROJECT = "vindr_yolov8"
 name = "initial_run"
 
 # Training parameters
-EPOCHS = 300
+EPOCHS = 500
 IMG_SIZE = 640
 PATIENCE = 50
 BATCH_SIZE = 16
@@ -13,7 +13,7 @@ SAVE = True
 
 # lr scheduling parameters
 LR0 = 0.001
-LRF = 0.01
+LRF = 0.001
 WARMUP_EPOCHS = 3.0
 WARMUP_MOMENTUM = 0.8
 WARMUP_BIAS_LR = 0.1
@@ -27,9 +27,9 @@ IOU = 0.5
 HSV_H = 0.015
 HSV_S = 0.7
 HSV_V = 0.4
-DEGREES = 2.0
+DEGREES = 5.0
 TRANSLATE = 0.1
-SCALE = 0.5
+SCALE = 0.0
 SHEAR = 0.0
 PERSPECTIVE = 0.0
 FLIPLR = 0.5
@@ -44,7 +44,8 @@ data_config = os.path.join(config_path, "data.yaml")
 
 # Load the model
 # model = YOLO("yolov8m.pt")
-model = YOLO("yolov8s.pt")
+# model = YOLO("yolov8n.pt")
+model = YOLO("yolov8l.pt")
 
 # Display the model information
 model.info()

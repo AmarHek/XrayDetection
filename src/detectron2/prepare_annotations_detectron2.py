@@ -38,8 +38,6 @@ def vindr_to_coco_format(image_id, annotations, old_shape, new_shape) -> List:
     width = (x_max - x_min)
     height = (y_max - y_min)
 
-    print(x_min, y_min, x_max, y_max)
-
     # iterate the dataframe and create the coco format list of annotations
     coco_annotations = []
     for i in range(len(annotations)):

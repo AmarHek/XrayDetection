@@ -139,5 +139,5 @@ if __name__ == "__main__":
         {"id": 13, "name": "Pulmonary fibrosis"}
     ]
 
-    dataset_path = "D:/Datasets/vindr/"
+    dataset_path = "/scratch/hekalo/Datasets/vindr/"
     preprocess_annotations_coco(dataset_path, categories)

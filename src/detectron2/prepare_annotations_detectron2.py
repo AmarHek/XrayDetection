@@ -65,7 +65,7 @@ def preprocess_annotations_coco(dataset_path, categories):
 
     dicom_path = os.path.join(dataset_path, "dicom")
     png_path = os.path.join(dataset_path, "png")
-    annotations_path = os.path.join(dataset_path, "annotations")
+    annotations_path = os.path.join(dataset_path, "annotations.csv")
 
     assert os.path.exists(dataset_path), f"Directory not found: {dataset_path}"
     assert os.path.exists(dicom_path), f"Directory not found: {dicom_path}"

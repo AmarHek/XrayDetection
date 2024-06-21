@@ -75,13 +75,7 @@ def preprocess_annotations_coco(dataset_path, categories):
     assert os.path.exists(png_path), f"Directory not found: {png_path}"
     assert os.path.exists(annotations_path), f"Directory not found: {annotations_path}"
 
-    # load the annotations file
     annotations = pd.read_csv(annotations_path)
-
-    # remove all rows with "No finding"
-    annotations = annotations[annotations["class_name"] != "No finding"]
-
-    # group by image_id
     grouped_data = annotations.groupby("image_id")
 
     # set up the coco format dictionary
@@ -92,16 +86,12 @@ def preprocess_annotations_coco(dataset_path, categories):
     }
 
     running_image_id = 1
-    # iterate over the grouped data
     for image_id, annotations in tqdm(grouped_data):
-        # get the dicom image
+        # get the original and new shape of the image
         dicom_image = os.path.join(dicom_path, f"{image_id}.dicom")
         old_shape = pydicom.dcmread(dicom_image).pixel_array.shape
         png_image = os.path.join(png_path, f"{image_id}.png")
         new_shape = cv2.imread(png_image).shape
-
-        # process the annotations
-        coco_format_annotations = vindr_to_coco_format(image_id, annotations, old_shape, new_shape)
 
         # add the image to the coco format
         coco_annotations["images"].append({
@@ -111,12 +101,15 @@ def preprocess_annotations_coco(dataset_path, categories):
             "width": new_shape[1]
         })
 
-        # add the annotations to the coco format
-        coco_annotations["annotations"].extend(coco_format_annotations)
+        # Only add annotations, if there are boxes, i.e. if there is no "No Finding" present
+        if not annotations["class_name"].values[0] == "No Finding":
+            # process the annotations
+            coco_format_annotations = vindr_to_coco_format(image_id, annotations, old_shape, new_shape)
+            # add the annotations to the coco format
+            coco_annotations["annotations"].extend(coco_format_annotations)
         running_image_id += 1
 
     # save the coco format annotations to a json file
-
     with open(os.path.join(dataset_path, "coco_annotations.json"), "w") as f:
         json.dump(coco_annotations, f)
 

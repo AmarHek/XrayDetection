@@ -5,6 +5,7 @@ from tqdm import tqdm
 
 import pydicom
 import pandas as pd
+import cv2
 
 
 def vindr_to_coco_format(image_id, annotations, old_shape, new_shape) -> List:
@@ -12,10 +13,10 @@ def vindr_to_coco_format(image_id, annotations, old_shape, new_shape) -> List:
     Processes the annotations to a YOLOv5 format txt file.
 
     :param annotations: The annotations for the given image as a pandas DataFrame.
-    :param image_width: The width of the image.
-    :param image_height: The height of the image.
+    :param old_shape: The shape of the original dicom image.
+    :param new_shape: The shape of the processed png image.
 
-    :return: The processed annotations as a pandas DataFrame.
+    :return: The processed COCO annotations as a list.
     """
 
     # get the class id
@@ -46,6 +47,8 @@ def vindr_to_coco_format(image_id, annotations, old_shape, new_shape) -> List:
             "category_id": class_id,
             "bbox": [x_min[i], y_max[i], width[i], height[i]]
         })
+
+    return coco_annotations
 
 
 def preprocess_annotations_coco(dataset_path, categories):
@@ -95,7 +98,7 @@ def preprocess_annotations_coco(dataset_path, categories):
         dicom_image = os.path.join(dicom_path, f"{image_id}.dicom")
         old_shape = pydicom.dcmread(dicom_image).pixel_array.shape
         png_image = os.path.join(png_path, f"{image_id}.png")
-        new_shape = pydicom.dcmread(png_image).pixel_array.shape
+        new_shape = cv2.imread(png_image).shape
 
         # process the annotations
         coco_format_annotations = vindr_to_coco_format(image_id, annotations, old_shape, new_shape)
@@ -136,5 +139,5 @@ if __name__ == "__main__":
         {"id": 13, "name": "Pulmonary fibrosis"}
     ]
 
-    dataset_path = "/scratch/hekalo/Datasets/vindr/"
+    dataset_path = "D:/Datasets/vindr/"
     preprocess_annotations_coco(dataset_path, categories)

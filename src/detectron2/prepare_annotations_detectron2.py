@@ -103,6 +103,8 @@ def preprocess_annotations_coco(dataset_path, categories):
             "width": int(new_shape[1])
         })
 
+        print(annotations["class_name"].values[0])
+
         # Only add annotations, if there are boxes, i.e. if there is no "No Finding" present
         if not annotations["class_name"].values[0] == "No Finding":
             # process the annotations

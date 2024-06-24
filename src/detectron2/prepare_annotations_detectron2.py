@@ -106,7 +106,7 @@ def preprocess_annotations_coco(dataset_path, categories):
         print(annotations["class_name"].values[0])
 
         # Only add annotations, if there are boxes, i.e. if there is no "No Finding" present
-        if not annotations["class_name"].values[0] == "No Finding":
+        if not annotations["class_name"].values[0] == "No finding":
             # process the annotations
             coco_format_annotations = vindr_to_coco_format(image_id, annotations, old_shape, new_shape)
             # add the annotations to the coco format

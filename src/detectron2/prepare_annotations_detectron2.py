@@ -41,11 +41,13 @@ def vindr_to_coco_format(image_id, annotations, old_shape, new_shape) -> List:
     # iterate the dataframe and create the coco format list of annotations
     coco_annotations = []
     for i in range(len(annotations)):
+        bbox = [x_min.iloc[i], y_max.iloc[i], width.iloc[i], height.iloc[i]]
+        print(bbox)
         coco_annotations.append({
             "id": i,
             "image_id": image_id,
             "category_id": class_id,
-            "bbox": [x_min.iloc[i], y_max.iloc[i], width.iloc[i], height.iloc[i]]
+            "bbox": bbox
         })
 
     return coco_annotations

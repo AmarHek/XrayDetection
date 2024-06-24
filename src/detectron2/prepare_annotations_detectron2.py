@@ -46,7 +46,7 @@ def vindr_to_coco_format(image_id, annotations, old_shape, new_shape) -> List:
         coco_annotations.append({
             "id": i,
             "image_id": image_id,
-            "category_id": class_id,
+            "category_id": int(class_id),
             "bbox": bbox
         })
 

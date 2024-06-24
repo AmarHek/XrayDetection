@@ -41,13 +41,11 @@ def vindr_to_coco_format(image_id, annotations, old_shape, new_shape) -> List:
     # iterate the dataframe and create the coco format list of annotations
     coco_annotations = []
     for i in range(len(annotations)):
-        bbox = [x_min.iloc[i], y_max.iloc[i], width.iloc[i], height.iloc[i]]
-        print(bbox)
         coco_annotations.append({
             "id": i,
             "image_id": image_id,
             "category_id": int(class_id),
-            "bbox": bbox
+            "bbox": [x_min.iloc[i], y_max.iloc[i], width.iloc[i], height.iloc[i]]
         })
 
     return coco_annotations
@@ -103,8 +101,6 @@ def preprocess_annotations_coco(dataset_path, categories):
             "width": int(new_shape[1])
         })
 
-        print(annotations["class_name"].values[0])
-
         # Only add annotations, if there are boxes, i.e. if there is no "No Finding" present
         if not annotations["class_name"].values[0] == "No finding":
             # process the annotations
@@ -112,11 +108,6 @@ def preprocess_annotations_coco(dataset_path, categories):
             # add the annotations to the coco format
             coco_annotations["annotations"].extend(coco_format_annotations)
         running_image_id += 1
-
-        if running_image_id == 5:
-            break
-
-    print(coco_annotations)
 
     # save the coco format annotations to a json file
     with open(os.path.join(dataset_path, "coco_annotations.json"), "w") as f:

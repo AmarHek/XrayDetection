@@ -109,6 +109,11 @@ def preprocess_annotations_coco(dataset_path, categories):
             coco_annotations["annotations"].extend(coco_format_annotations)
         running_image_id += 1
 
+        if running_image_id == 10:
+            break
+
+    print(coco_annotations)
+
     # save the coco format annotations to a json file
     with open(os.path.join(dataset_path, "coco_annotations.json"), "w") as f:
         json.dump(coco_annotations, f)

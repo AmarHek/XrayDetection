@@ -45,7 +45,7 @@ def vindr_to_coco_format(image_id, annotations, old_shape, new_shape) -> List:
             "id": i,
             "image_id": image_id,
             "category_id": class_id,
-            "bbox": [int(x_min.iloc[i]), int(y_max.iloc[i]), int(width.iloc[i]), int(height.iloc[i])]
+            "bbox": [x_min.iloc[i], y_max.iloc[i], width.iloc[i], height.iloc[i]]
         })
 
     return coco_annotations
@@ -109,7 +109,7 @@ def preprocess_annotations_coco(dataset_path, categories):
             coco_annotations["annotations"].extend(coco_format_annotations)
         running_image_id += 1
 
-        if running_image_id == 10:
+        if running_image_id == 5:
             break
 
     print(coco_annotations)

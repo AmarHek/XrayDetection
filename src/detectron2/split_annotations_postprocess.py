@@ -37,8 +37,6 @@ def split_annotations(annotation_file, train_dir, val_dir, test_dir, output_dir)
     get_image_ids(val_dir, val_img_ids)
     get_image_ids(test_dir, test_img_ids)
 
-    print(train_img_ids, val_img_ids, test_img_ids)
-
     def filter_data(img_ids, target_data):
         for img in coco_data['images']:
             if img['id'] in img_ids:

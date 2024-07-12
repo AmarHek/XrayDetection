@@ -101,8 +101,8 @@ def preprocess_dataset(dicom_root, png_root):
 
 
 if __name__ == "__main__":
-    dicom_root = "/scratch/hekalo/Datasets/vindr/dicom/"
-    png_root = "/scratch/hekalo/Datasets/vindr/png/"
+    dicom_root = "/scratch/hekalo/Datasets/vindr/test/dicom/"
+    png_root = "/scratch/hekalo/Datasets/vindr/test/png/"
 
     preprocess_dataset(dicom_root, png_root)
 

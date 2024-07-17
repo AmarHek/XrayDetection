@@ -20,7 +20,7 @@ def vindr_to_coco_format(image_id, class_config, annotations, old_shape, new_sha
     """
 
     # drop all rows with "No Finding" as class name
-    annotations = annotations[annotations["class_name"] != "No Finding"]
+    annotations = annotations[annotations["class_name"] != "No finding"]
 
     # if there are no annotations left, return None
     if len(annotations) == 0:

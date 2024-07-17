@@ -1,22 +1,28 @@
-# Train/val/test sets as 1) dir: path/to/imgs, 2) file: path/to/imgs.txt, or 3) list: [path/to/imgs1, path/to/imgs2, ..]
-path: /scratch/hekalo/Datasets/vindr/dataset  # dataset root dir
+path: /scratch/hekalo/Datasets/vindr/trainval/dicom/
 train: images/train
 val: images/val
 test: images/test
-
-# Classes
 names:
   0: Aortic enlargement
   1: Atelectasis
   2: Calcification
   3: Cardiomegaly
-  4: Consolidation
-  5: ILD
-  6: Infiltration
-  7: Lung Opacity
-  8: Nodule/Mass
-  9: Other lesion
-  10: Pleural effusion
-  11: Pleural thickening
-  12: Pneumothorax
-  13: Pulmonary fibrosis
+  4: Clavicle fracture
+  5: Consolidation
+  6: Edema
+  7: Emphysema
+  8: Enlarged PA
+  9: ILD
+  10: Infiltration
+  11: Lung Opacity
+  12: Lung cavity
+  13: Lung cyst
+  14: Mediastinal shift
+  15: No finding
+  16: Nodule/Mass
+  17: Other lesion
+  18: Pleural effusion
+  19: Pleural thickening
+  20: Pneumothorax
+  21: Pulmonary fibrosis
+  22: Rib fracture

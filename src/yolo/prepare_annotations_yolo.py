@@ -1,23 +1,27 @@
 import os
+
+import yaml
 from tqdm import tqdm
 
 import pydicom
 import pandas as pd
 
 
-def vindr_to_yolo_format(annotations, image_width, image_height) -> pd.DataFrame:
+def vindr_to_yolo_format(annotations, class_config, image_width, image_height) -> pd.DataFrame:
     """
     Processes the annotations to a YOLOv5 format txt file.
 
     :param annotations: The annotations for the given image as a pandas DataFrame.
+    :param class_config: Dictionary of class names and their corresponding ids.
     :param image_width: The width of the image.
     :param image_height: The height of the image.
 
     :return: The processed annotations as a pandas DataFrame.
     """
 
-    # get the class id
-    class_id = annotations["class_id"].values[0]
+    # get the class ids
+    class_names = annotations["class_name"].values
+    class_id = [class_config[class_name] for class_name in class_names]
 
     # get the coordinates
     x_min = annotations["x_min"]
@@ -37,13 +41,15 @@ def vindr_to_yolo_format(annotations, image_width, image_height) -> pd.DataFrame
     width /= image_width
     height /= image_height
 
-    return pd.DataFrame({
+    result = pd.DataFrame({
         "class_id": class_id,
         "x_center": x_center,
         "y_center": y_center,
         "width": width,
         "height": height
     })
+
+    return result
 
 
 def save_to_txt(annotations, image_id, output_path):
@@ -62,7 +68,7 @@ def save_to_txt(annotations, image_id, output_path):
     annotations.to_csv(file_name, sep=" ", index=False, header=False)
 
 
-def preprocess_annotations(annotations_file, dicom_path, output_path):
+def preprocess_annotations(annotations_file, config_file, dicom_path, output_path):
     """
     Preprocesses the annotations file to YOLOv5 format.
     The annotations file is a csv file of all annotations with the following columns:
@@ -78,11 +84,12 @@ def preprocess_annotations(annotations_file, dicom_path, output_path):
     :param output_path: The path to save the processed annotations.
     """
 
-    assert os.path.exists(annotations_file), f"File not found: {annotations_file}"
-    assert os.path.exists(dicom_path), f"Directory not found: {dicom_path}"
-
-    # load the annotations file
+    # load the files
     annotations = pd.read_csv(annotations_file)
+    config = yaml.load(open(config_file, "r"), Loader=yaml.FullLoader)
+    class_dict = config["names"]
+    # reverse the dictionary to get the class id from the class name
+    class_config = {v: k for k, v in class_dict.items()}
 
     # create the output directory if it does not exist
     if not os.path.exists(output_path):
@@ -102,15 +109,58 @@ def preprocess_annotations(annotations_file, dicom_path, output_path):
         image_height, image_width = dicom.pixel_array.shape
 
         # process the annotations
-        yolo_annotations = vindr_to_yolo_format(annotations, image_width, image_height)
+        yolo_annotations = vindr_to_yolo_format(annotations, class_config, image_width, image_height)
 
         # save the annotations to a txt file
         save_to_txt(yolo_annotations, image_id, output_path)
 
 
+def create_yolo_config(dataset_path, annotations_file, output_path=".", image_root="images"):
+    """
+    Creates the YOLOv5 configuration file for the dataset.
+
+    :param dataset_path: The path to the dataset.
+    :param annotations_file: The path to the annotations file.
+    :param output_path: The path to save the configuration file.
+    :param image_root: The root directory for the images.
+    """
+
+    # load the annotations file
+    annotations = pd.read_csv(annotations_file)
+
+    # get the unique class names as dictionary
+    class_names = annotations["class_name"].unique()
+    class_names = sorted(class_names)
+    class_names = {i: class_name for i, class_name in enumerate(class_names)}
+
+    # create the config file
+    config = {
+        "path": f"{dataset_path}",
+        "train": f"{image_root}/train",
+        "val": f"{image_root}/val",
+        "test": f"{image_root}/test",
+        "names": class_names
+    }
+
+    # save the file
+    with open(os.path.join(output_path, "data.yaml"), "w") as f:
+        yaml.dump(config, f, sort_keys=False)
+
+
 if __name__ == "__main__":
-    ann_file = "/scratch/hekalo/Datasets/vindr/annotations.csv"
-    dcm_path = "/scratch/hekalo/Datasets/vindr/dicom/"
+    ann_file_train = "/scratch/hekalo/Datasets/vindr/annotations_train.csv"
+    # ann_file_train_local = "~/Git/xraydetection/data-sample/annotations_train.csv"
+    ann_file_test = "/scratch/hekalo/Datasets/vindr/annotations_test.csv"
+    dcm_path_train = "/scratch/hekalo/Datasets/vindr/trainval/dicom/"
+    dcm_path_test = "/scratch/hekalo/Datasets/vindr/test/dicom/"
     annotations_path = "/scratch/hekalo/Datasets/vindr/annotations/"
 
-    preprocess_annotations(ann_file, dcm_path, annotations_path)
+    config_path = "~/Git/xraydetection/configs/"
+    # config_path_local = "C:/Users/Amar/Git/xraydetection/configs/"
+    config_file = os.path.join(config_path, "data.yaml")
+
+    create_yolo_config(dcm_path_train, ann_file_train, config_path, image_root="images")
+
+    preprocess_annotations(ann_file_train, config_file, dcm_path_train, annotations_path)
+    preprocess_annotations(ann_file_test, config_file, dcm_path_test, annotations_path)
+

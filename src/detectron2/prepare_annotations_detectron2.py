@@ -21,6 +21,9 @@ def vindr_to_coco_format(image_id, class_config, annotations, old_shape, new_sha
 
     # get the class names and coordinates
     class_names = annotations["class_name"].values
+    if "No Finding" in class_names:
+        print(class_names)
+        return None
     x_min = annotations["x_min"]
     y_min = annotations["y_min"]
     x_max = annotations["x_max"]
@@ -99,11 +102,11 @@ def preprocess_annotations_coco(image_path, annotations_file, categories, output
         })
 
         # Only add annotations, if there are boxes, i.e. if there is no "No Finding" present
-        if not annotations["class_name"].values[0] == "No finding":
-            # process the annotations
-            coco_format_annotations = vindr_to_coco_format(running_image_id, class_config,
-                                                           annotations, old_shape, new_shape)
-            # add the annotations to the coco format
+        # process the annotations
+        coco_format_annotations = vindr_to_coco_format(running_image_id, class_config,
+                                                       annotations, old_shape, new_shape)
+        # add the annotations to the coco format
+        if coco_format_annotations:
             coco_annotations["annotations"].extend(coco_format_annotations)
         running_image_id += 1
 

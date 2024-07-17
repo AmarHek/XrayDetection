@@ -1,0 +1,2 @@
+/autofs/ls6/hekalo/Git/xraydetection/venv/bin/python: can't open file '/autofs/ls6/hekalo/Git/xraydetection/src/train_volov8_lowres.py': [Errno 2] No such file or directory
+srun: error: gpu1c: task 0: Exited with exit code 2

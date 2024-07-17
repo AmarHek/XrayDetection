@@ -21,10 +21,7 @@ def vindr_to_coco_format(image_id, class_config, annotations, old_shape, new_sha
 
     # get the class names and coordinates
     class_names = annotations["class_name"].values
-    print(annotations)
-    print(class_names)
-    if "No Finding" in class_names:
-        print(class_names)
+    if "No finding" in class_names:
         return None
     x_min = annotations["x_min"]
     y_min = annotations["y_min"]

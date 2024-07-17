@@ -130,6 +130,8 @@ def create_yolo_config(dataset_path, annotations_file, output_path=".", image_ro
 
     # get the unique class names as dictionary
     class_names = annotations["class_name"].unique()
+    # remove "No finding" from the class names
+    class_names = [class_name for class_name in class_names if class_name != "No finding"]
     class_names = sorted(class_names)
     class_names = {i: class_name for i, class_name in enumerate(class_names)}
 

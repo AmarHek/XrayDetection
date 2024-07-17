@@ -18,11 +18,10 @@ names:
   12: Lung cavity
   13: Lung cyst
   14: Mediastinal shift
-  15: No finding
-  16: Nodule/Mass
-  17: Other lesion
-  18: Pleural effusion
-  19: Pleural thickening
-  20: Pneumothorax
-  21: Pulmonary fibrosis
-  22: Rib fracture
+  15: Nodule/Mass
+  16: Other lesion
+  17: Pleural effusion
+  18: Pleural thickening
+  19: Pneumothorax
+  20: Pulmonary fibrosis
+  21: Rib fracture

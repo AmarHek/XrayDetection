@@ -155,7 +155,7 @@ if __name__ == "__main__":
     dcm_path_test = "/scratch/hekalo/Datasets/vindr/test/dicom/"
     annotations_path = "/scratch/hekalo/Datasets/vindr/annotations/"
 
-    config_path = "~/Git/xraydetection/configs/"
+    config_path = "/home/ls6/hekalo/Git/xraydetection/configs/"
     # config_path_local = "C:/Users/Amar/Git/xraydetection/configs/"
     config_file = os.path.join(config_path, "data.yaml")
 

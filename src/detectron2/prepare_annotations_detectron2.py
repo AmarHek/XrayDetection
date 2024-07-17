@@ -8,7 +8,7 @@ import pandas as pd
 import cv2
 
 
-def vindr_to_coco_format(image_id, annotations, old_shape, new_shape) -> List:
+def vindr_to_coco_format(image_id, class_config, annotations, old_shape, new_shape) -> List:
     """
     Processes the annotations to a YOLOv5 format txt file.
 
@@ -19,10 +19,8 @@ def vindr_to_coco_format(image_id, annotations, old_shape, new_shape) -> List:
     :return: The processed COCO annotations as a list.
     """
 
-    # get the class id
-    class_id = annotations["class_id"].values[0]
-
-    # get the coordinates
+    # get the class names and coordinates
+    class_names = annotations["class_name"].values
     x_min = annotations["x_min"]
     y_min = annotations["y_min"]
     x_max = annotations["x_max"]
@@ -44,14 +42,14 @@ def vindr_to_coco_format(image_id, annotations, old_shape, new_shape) -> List:
         coco_annotations.append({
             "id": i,
             "image_id": image_id,
-            "category_id": int(class_id),
+            "category_id": int(class_config[class_names[i]]),
             "bbox": [x_min.iloc[i], y_max.iloc[i], width.iloc[i], height.iloc[i]]
         })
 
     return coco_annotations
 
 
-def preprocess_annotations_coco(dataset_path, categories):
+def preprocess_annotations_coco(image_path, annotations_file, categories, output_file="coco_annotations.csv"):
     """
     Preprocesses the annotations file to COCO format.
     The annotations file is a csv file of all annotations with the following columns:
@@ -59,23 +57,19 @@ def preprocess_annotations_coco(dataset_path, categories):
     The coordinates are given in the original image size.
     For COCO format, the coordinates are adjusted to fit the resized images.
 
-    :param dataset_path: The path to the full dataset. Requires the following dirs and files:
+    :param image_path: The path to the full dataset. Requires the following dirs and files:
     dicom: The directory containing all dicom images.
     png: The directory containing all resized png images.
-    annotations: The file containing the original annotations.
+    annotations_file: The file containing the original annotations.
+    categories: The list of categories in COCO format.
+    output_file: The name of the output file.
     Images should be located inside these directories as {image_id}.dicom/png.
     """
 
-    dicom_path = os.path.join(dataset_path, "dicom")
-    png_path = os.path.join(dataset_path, "png")
-    annotations_path = os.path.join(dataset_path, "annotations.csv")
+    dicom_path = os.path.join(image_path, "dicom")
+    png_path = os.path.join(image_path, "png")
 
-    assert os.path.exists(dataset_path), f"Directory not found: {dataset_path}"
-    assert os.path.exists(dicom_path), f"Directory not found: {dicom_path}"
-    assert os.path.exists(png_path), f"Directory not found: {png_path}"
-    assert os.path.exists(annotations_path), f"Directory not found: {annotations_path}"
-
-    annotations = pd.read_csv(annotations_path)
+    annotations = pd.read_csv(annotations_file)
     grouped_data = annotations.groupby("image_id")
 
     # set up the coco format dictionary
@@ -84,6 +78,9 @@ def preprocess_annotations_coco(dataset_path, categories):
         "annotations": [],
         "categories": categories
     }
+
+    # turn categories into a dictionary of class name to class id
+    class_config = {category["name"]: category["id"] for category in categories}
 
     running_image_id = 1
     for image_id, annotations in tqdm(grouped_data):
@@ -104,13 +101,14 @@ def preprocess_annotations_coco(dataset_path, categories):
         # Only add annotations, if there are boxes, i.e. if there is no "No Finding" present
         if not annotations["class_name"].values[0] == "No finding":
             # process the annotations
-            coco_format_annotations = vindr_to_coco_format(running_image_id, annotations, old_shape, new_shape)
+            coco_format_annotations = vindr_to_coco_format(running_image_id, class_config,
+                                                           annotations, old_shape, new_shape)
             # add the annotations to the coco format
             coco_annotations["annotations"].extend(coco_format_annotations)
         running_image_id += 1
 
     # save the coco format annotations to a json file
-    with open(os.path.join(dataset_path, "coco_annotations.json"), "w") as f:
+    with open(os.path.join(output_file), "w") as f:
         json.dump(coco_annotations, f)
 
 
@@ -120,17 +118,34 @@ if __name__ == "__main__":
         {"id": 1, "name": "Atelectasis"},
         {"id": 2, "name": "Calcification"},
         {"id": 3, "name": "Cardiomegaly"},
-        {"id": 4, "name": "Consolidation"},
-        {"id": 5, "name": "ILD"},
-        {"id": 6, "name": "Infiltration"},
-        {"id": 7, "name": "Lung Opacity"},
-        {"id": 8, "name": "Nodule/Mass"},
-        {"id": 9, "name": "Other lesion"},
-        {"id": 10, "name": "Pleural effusion"},
-        {"id": 11, "name": "Pleural thickening"},
-        {"id": 12, "name": "Pneumothorax"},
-        {"id": 13, "name": "Pulmonary fibrosis"}
+        {"id": 4, "name": "Clavicle fracture"},
+        {"id": 5, "name": "Consolidation"},
+        {"id": 6, "name": "Edema"},
+        {"id": 7, "name": "Emphysema"},
+        {"id": 8, "name": "Enlarged PA"},
+        {"id": 9, "name": "ILD"},
+        {"id": 10, "name": "Infiltration"},
+        {"id": 11, "name": "Lung Opacity"},
+        {"id": 12, "name": "Lung cavity"},
+        {"id": 13, "name": "Lung cyst"},
+        {"id": 14, "name": "Mediastinal shift"},
+        {"id": 15, "name": "Nodule/Mass"},
+        {"id": 16, "name": "Other lesion"},
+        {"id": 17, "name": "Pleural effusion"},
+        {"id": 18, "name": "Pleural thickening"},
+        {"id": 19, "name": "Pneumothorax"},
+        {"id": 20, "name": "Pulmonary fibrosis"},
+        {"id": 21, "name": "Rib fracture"}
     ]
 
-    dataset_path = "/scratch/hekalo/Datasets/vindr/"
-    preprocess_annotations_coco(dataset_path, categories)
+    trainval_path = "/scratch/hekalo/Datasets/vindr/trainval/"
+    trainval_annotations = "/scratch/hekalo/Datasets/vindr/annotations_train.csv"
+    output_path_trainval = "/scratch/hekalo/Datasets/vindr/coco_annotations_trainval.json"
+    test_path = "/scratch/hekalo/Datasets/vindr/test/"
+    test_annotations = "/scratch/hekalo/Datasets/vindr/annotations_test.csv"
+    output_path_test = "/scratch/hekalo/Datasets/vindr/coco_annotations_test.json"
+
+    preprocess_annotations_coco(trainval_path, trainval_annotations,
+                                categories, output_file=output_path_trainval)
+    preprocess_annotations_coco(test_path, test_annotations,
+                                categories, output_file=output_path_test)

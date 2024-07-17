@@ -8,7 +8,7 @@ import pandas as pd
 import cv2
 
 
-def vindr_to_coco_format(image_id, class_config, annotations, old_shape, new_shape) -> List:
+def vindr_to_coco_format(image_id, class_config, annotations, old_shape, new_shape) -> List or None:
     """
     Processes the annotations to a YOLOv5 format txt file.
 
@@ -19,10 +19,15 @@ def vindr_to_coco_format(image_id, class_config, annotations, old_shape, new_sha
     :return: The processed COCO annotations as a list.
     """
 
+    # drop all rows with "No Finding" as class name
+    annotations = annotations[annotations["class_name"] != "No Finding"]
+
+    # if there are no annotations left, return None
+    if len(annotations) == 0:
+        return None
+
     # get the class names and coordinates
     class_names = annotations["class_name"].values
-    if "No finding" in class_names:
-        return None
     x_min = annotations["x_min"]
     y_min = annotations["y_min"]
     x_max = annotations["x_max"]

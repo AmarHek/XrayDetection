@@ -1,4 +1,4 @@
-path: /scratch/hekalo/Datasets/vindr/trainval/dicom/
+path: /scratch/hekalo/Datasets/vindr/dataset/
 train: images/train
 val: images/val
 test: images/test

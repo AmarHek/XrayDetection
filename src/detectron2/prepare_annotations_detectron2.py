@@ -8,7 +8,7 @@ import pandas as pd
 import cv2
 
 
-def vindr_to_coco_format(image_id, class_config, annotations, old_shape, new_shape) -> List or None:
+def vindr_to_coco_format(image_id, running_annotation_id, class_config, annotations, old_shape, new_shape) -> List or None:
     """
     Processes the annotations to a YOLOv5 format txt file.
 
@@ -47,7 +47,7 @@ def vindr_to_coco_format(image_id, class_config, annotations, old_shape, new_sha
     coco_annotations = []
     for i in range(len(annotations)):
         coco_annotations.append({
-            "id": i,
+            "id": running_annotation_id + i,
             "image_id": image_id,
             "category_id": int(class_config[class_names[i]]),
             "bbox": [x_min.iloc[i], y_max.iloc[i], width.iloc[i], height.iloc[i]]
@@ -90,6 +90,7 @@ def preprocess_annotations_coco(image_path, annotations_file, categories, output
     class_config = {category["name"]: category["id"] for category in categories}
 
     running_image_id = 1
+    running_annotation_id = 1
     for image_id, annotations in tqdm(grouped_data):
         # get the original and new shape of the image
         dicom_image = os.path.join(dicom_path, f"{image_id}.dicom")
@@ -112,6 +113,7 @@ def preprocess_annotations_coco(image_path, annotations_file, categories, output
         # add the annotations to the coco format
         if coco_format_annotations:
             coco_annotations["annotations"].extend(coco_format_annotations)
+            running_annotation_id += len(coco_format_annotations)
         running_image_id += 1
 
     # save the coco format annotations to a json file

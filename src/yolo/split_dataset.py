@@ -55,7 +55,7 @@ def create_yolov8_dataset(trainval_png_path, test_png_path, annotations_path, ou
     # the splits are 'train', 'val', and 'test' within these directories
     directories = ["images", "labels"]
     # split_names = ["train", "val", "test"]
-    split_names = ["train", "val", "test"]
+    split_names = ["train", "val"]
 
     for directory in directories:
         for split in split_names:

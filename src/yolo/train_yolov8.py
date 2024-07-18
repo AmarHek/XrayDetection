@@ -2,7 +2,8 @@ import os
 from ultralytics import YOLO
 
 PROJECT = "vindr_yolov8"
-name = "initial_run"
+name = "full_res_run"
+data_config = "/scratch/hekalo/Datasets/vindr/dataset/yolo_config.yaml"
 
 # Training parameters
 EPOCHS = 500
@@ -39,8 +40,6 @@ COPY_PASTE = 0.0
 ERASING = 0.0
 CROP_FRACTION = 1.0
 
-config_path = os.path.join(os.getcwd(), "configs")
-data_config = os.path.join(config_path, "data.yaml")
 
 # Load the model
 # model = YOLO("yolov8m.pt")

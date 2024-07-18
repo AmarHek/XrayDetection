@@ -2,7 +2,8 @@ import os
 from ultralytics import YOLO
 
 PROJECT = "vindr_yolov8"
-name = "initial_run"
+name = "low_res_run"
+data_config = "/scratch/hekalo/Datasets/vindr/dataset/yolo_config.yaml"
 
 # Training parameters
 EPOCHS = 500

@@ -1,6 +1,8 @@
 import os
 import shutil
 
+from tqdm import tqdm
+
 
 def create_split(images, train_ratio):
     """
@@ -63,16 +65,16 @@ def create_yolov8_dataset(trainval_png_path, test_png_path, annotations_path, ou
 
     # copy the images and annotations to the output directory
     for split, images in zip(split_names, image_splits):
-        for image in images:
+        print(f"Copying {split} images and annotations...")
+        for image in tqdm(images):
             image_id = os.path.basename(image).replace(".png", "")
             shutil.copy(image, os.path.join(output_path, "images", str(split), f"{image_id}.png"))
-            try:
+            if os.path.exists(os.path.join(annotations_path, f"{image_id}.txt")):
                 shutil.copy(os.path.join(annotations_path, f"{image_id}.txt"),
                             os.path.join(output_path, "labels", str(split), f"{image_id}.txt"))
-            except FileNotFoundError:
-                print(f"No annotations found for {image_id}. Skipping...")
 
-    for image in images_test:
+    print(f"Copying test images and annotations...")
+    for image in tqdm(images_test):
         image_id = os.path.basename(image).replace(".png", "")
         shutil.copy(image, os.path.join(output_path, "images", "test", f"{image_id}.png"))
         try:

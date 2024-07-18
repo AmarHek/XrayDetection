@@ -108,8 +108,9 @@ def preprocess_annotations_coco(image_path, annotations_file, categories, output
 
         # Only add annotations, if there are boxes, i.e. if there is no "No Finding" present
         # process the annotations
-        coco_format_annotations = vindr_to_coco_format(running_image_id, class_config,
-                                                       annotations, old_shape, new_shape)
+        coco_format_annotations = vindr_to_coco_format(running_image_id, running_annotation_id,
+                                                       class_config, annotations,
+                                                       old_shape, new_shape)
         # add the annotations to the coco format
         if coco_format_annotations:
             coco_annotations["annotations"].extend(coco_format_annotations)

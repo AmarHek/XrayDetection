@@ -13,4 +13,4 @@
 source /home/ls6/hekalo/Git/xraydetection/venv/bin/activate
 
 # Run your script
-srun python src/train_volov8_lowres.py
+srun python src/yolo/train_volov8_lowres.py

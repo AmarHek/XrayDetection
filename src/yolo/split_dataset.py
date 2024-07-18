@@ -68,7 +68,8 @@ def create_yolov8_dataset(trainval_png_path, test_png_path, annotations_path, ou
         print(f"Copying {split} images and annotations...")
         for image in tqdm(images):
             image_id = os.path.basename(image).replace(".png", "")
-            shutil.copy(image, os.path.join(output_path, "images", str(split), f"{image_id}.png"))
+            if not os.path.exists(os.path.join(output_path, "images", str(split), f"{image_id}.png")):
+                shutil.copy(image, os.path.join(output_path, "images", str(split), f"{image_id}.png"))
             if os.path.exists(os.path.join(annotations_path, f"{image_id}.txt")):
                 shutil.copy(os.path.join(annotations_path, f"{image_id}.txt"),
                             os.path.join(output_path, "labels", str(split), f"{image_id}.txt"))
@@ -76,12 +77,11 @@ def create_yolov8_dataset(trainval_png_path, test_png_path, annotations_path, ou
     print(f"Copying test images and annotations...")
     for image in tqdm(images_test):
         image_id = os.path.basename(image).replace(".png", "")
-        shutil.copy(image, os.path.join(output_path, "images", "test", f"{image_id}.png"))
-        try:
+        if not os.path.exists(os.path.join(output_path, "images", "test", f"{image_id}.png")):
+            shutil.copy(image, os.path.join(output_path, "images", "test", f"{image_id}.png"))
+        if os.path.exists(os.path.join(annotations_path, f"{image_id}.txt")):
             shutil.copy(os.path.join(annotations_path, f"{image_id}.txt"),
                         os.path.join(output_path, "labels", "test", f"{image_id}.txt"))
-        except FileNotFoundError:
-            print(f"No annotations found for {image_id}. Skipping...")
 
 
 if __name__ == "__main__":

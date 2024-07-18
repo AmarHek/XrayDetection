@@ -2,6 +2,8 @@ import os
 import cv2
 import random
 import json
+
+import torch
 from detectron2.engine import DefaultTrainer, DefaultPredictor
 from detectron2.config import get_cfg
 from detectron2.model_zoo import model_zoo
@@ -37,8 +39,8 @@ register_coco_instances("vindr_val", {}, val_json, val_dir)
 register_coco_instances("vindr_test", {}, test_json, test_dir)
 
 # Verify the registration
-vindr_train_metadata = MetadataCatalog.get("vinDr_train")
-dataset_dicts = DatasetCatalog.get("vinDr_train")
+vindr_train_metadata = MetadataCatalog.get("vindr_train")
+dataset_dicts = DatasetCatalog.get("vindr_train")
 
 
 # Set up the configuration
@@ -46,6 +48,7 @@ cfg = get_cfg()
 cfg.merge_from_file(model_zoo.get_config_file(model_config))
 cfg.DATASETS.TRAIN = ("vindr_train",)
 cfg.DATASETS.TEST = ("vindr_val",)
+cfg.TEST.EVAL_PERIOD = 1500
 cfg.DATALOADER.NUM_WORKERS = num_workers
 cfg.MODEL.WEIGHTS = model_zoo.get_checkpoint_url(model_config)  # Use pre-trained weights
 cfg.SOLVER.IMS_PER_BATCH = batch_size
@@ -56,25 +59,46 @@ cfg.MODEL.ROI_HEADS.NUM_CLASSES = num_classes  # Number of classes in your datas
 
 os.makedirs(cfg.OUTPUT_DIR, exist_ok=True)
 
+
+# Custom Trainer to save the best model
+class BestModelTrainer(DefaultTrainer):
+    def __init__(self, cfg):
+        super().__init__(cfg)
+        self.best_metric = float("inf")
+        self.best_model_weights = None
+
+    @classmethod
+    def build_evaluator(cls, cfg, dataset_name):
+        return COCOEvaluator(dataset_name, cfg, False, output_dir=cfg.OUTPUT_DIR)
+
+    def build_hooks(self):
+        hooks = super().build_hooks()
+        hooks.insert(-1, hooks.EvalHook(
+            0, lambda: self.test(self.cfg, self.model)
+        ))
+        return hooks
+
+    def test(self, cfg, model, evaluators=None):
+        results = super().test(cfg, model, evaluators)
+        # Assuming "bbox/AP" is the metric you care about
+        if results["bbox"]["AP"] < self.best_metric:
+            self.best_metric = results["bbox"]["AP"]
+            self.best_model_weights = model.state_dict()
+            torch.save(self.best_model_weights, os.path.join(cfg.OUTPUT_DIR, "best_model.pth"))
+        return results
+
+
 # Train the model
-trainer = DefaultTrainer(cfg)
+trainer = BestModelTrainer(cfg)
 trainer.resume_or_load(resume=False)
 trainer.train()
 
-# Evaluate the model
-evaluator = COCOEvaluator("my_dataset_val", cfg, False, output_dir="./output/")
-val_loader = build_detection_test_loader(cfg, "my_dataset_val")
-print(inference_on_dataset(trainer.model, val_loader, evaluator))
-
-# Inference with the trained model
-cfg.MODEL.WEIGHTS = os.path.join(cfg.OUTPUT_DIR, "model_final.pth")
+# Load the best model for inference
+cfg.MODEL.WEIGHTS = os.path.join(cfg.OUTPUT_DIR, "best_model.pth")
 predictor = DefaultPredictor(cfg)
 
-v = Visualizer(image[:, :, ::-1],
-               metadata=vindr_train_metadata,
-               scale=0.5,
-               instance_mode=ColorMode.SEGMENTATION)
-v = v.draw_instance_predictions(outputs["instances"].to("cpu"))
-cv2.imshow('prediction', v.get_image()[:, :, ::-1])
-cv2.waitKey(0)
-cv2.destroyAllWindows()
+# Evaluate the model on the test set
+evaluator = COCOEvaluator("vindr_test", cfg, False, output_dir="./output/")
+test_loader = build_detection_test_loader(cfg, "vindr_test")
+print(inference_on_dataset(predictor.model, test_loader, evaluator))
+

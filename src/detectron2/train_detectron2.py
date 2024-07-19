@@ -92,11 +92,11 @@ class BestCheckpointerHook(HookBase):
 
 # Custom Trainer to add BestCheckpointerHook
 class BestModelTrainer(DefaultTrainer):
-    @classmethod
-    def build_hooks(cls):
+    def build_hooks(self):
         hooks = super().build_hooks()
-        hooks.insert(-1, BestCheckpointerHook(cls.cfg))
-        hooks = hooks[:-2] + [EvalHook(cls.cfg.TEST.EVAL_PERIOD, cls.test)] + hooks[-2:]
+        hooks.insert(-1, BestCheckpointerHook(self.cfg))
+        hooks = [hook for hook in hooks if not isinstance(hook, EvalHook)]
+        hooks.append(EvalHook(self.cfg.TEST.EVAL_PERIOD, self.test))
         return hooks
 
 

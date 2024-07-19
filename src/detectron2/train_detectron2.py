@@ -2,8 +2,8 @@ import os
 import cv2
 import random
 import json
-
 import torch
+
 from detectron2.engine import DefaultTrainer, DefaultPredictor
 from detectron2.config import get_cfg
 from detectron2.model_zoo import model_zoo
@@ -12,6 +12,7 @@ from detectron2.data.datasets import register_coco_instances
 from detectron2.data import MetadataCatalog, DatasetCatalog
 from detectron2.evaluation import COCOEvaluator, inference_on_dataset
 from detectron2.data import build_detection_test_loader
+from detectron2.engine.hooks import HookBase, EvalHook
 
 # Paths to your data
 root = "/scratch/hekalo/Datasets/vindr/dataset/"
@@ -60,32 +61,43 @@ cfg.MODEL.ROI_HEADS.NUM_CLASSES = num_classes  # Number of classes in your datas
 os.makedirs(cfg.OUTPUT_DIR, exist_ok=True)
 
 
-# Custom Trainer to save the best model
-class BestModelTrainer(DefaultTrainer):
+# Custom Hook to save the best model based on validation loss
+class BestCheckpointerHook(HookBase):
     def __init__(self, cfg):
-        super().__init__(cfg)
-        self.best_metric = float("inf")
+        self.cfg = cfg.clone()
+        self.best_loss = float("inf")
         self.best_model_weights = None
 
+    def after_step(self):
+        # Ensure evaluation only happens at the end of each epoch
+        if self.trainer.iter % self.cfg.TEST.EVAL_PERIOD == 0 and self.trainer.iter != 0:
+            val_loss = self._compute_validation_loss()
+            if val_loss < self.best_loss:
+                self.best_loss = val_loss
+                self.best_model_weights = self.trainer.model.state_dict()
+                torch.save(self.best_model_weights, os.path.join(self.cfg.OUTPUT_DIR, "best_model.pth"))
+
+    def _compute_validation_loss(self):
+        self.trainer.model.eval()
+        val_loss = 0
+        val_loader = build_detection_test_loader(self.cfg, self.cfg.DATASETS.TEST[0])
+        with torch.no_grad():
+            for batch in val_loader:
+                loss_dict = self.trainer.model(batch)
+                losses = sum(loss_dict.values())
+                val_loss += losses.item()
+        self.trainer.model.train()
+        return val_loss / len(val_loader)
+
+
+# Custom Trainer to add BestCheckpointerHook
+class BestModelTrainer(DefaultTrainer):
     @classmethod
-    def build_evaluator(cls, cfg, dataset_name):
-        return COCOEvaluator(dataset_name, cfg, False, output_dir=cfg.OUTPUT_DIR)
-
-    def build_hooks(self):
+    def build_hooks(cls):
         hooks = super().build_hooks()
-        hooks.insert(-1, hooks.EvalHook(
-            0, lambda: self.test(self.cfg, self.model)
-        ))
+        hooks.insert(-1, BestCheckpointerHook(cls.cfg))
+        hooks = hooks[:-2] + [EvalHook(cls.cfg.TEST.EVAL_PERIOD, cls.test)] + hooks[-2:]
         return hooks
-
-    def test(self, cfg, model, evaluators=None):
-        results = super().test(cfg, model, evaluators)
-        # Assuming "bbox/AP" is the metric you care about
-        if results["bbox"]["AP"] < self.best_metric:
-            self.best_metric = results["bbox"]["AP"]
-            self.best_model_weights = model.state_dict()
-            torch.save(self.best_model_weights, os.path.join(cfg.OUTPUT_DIR, "best_model.pth"))
-        return results
 
 
 # Train the model

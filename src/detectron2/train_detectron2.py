@@ -52,7 +52,7 @@ cfg.SOLVER.MAX_ITER = 50000    # Number of iterations
 cfg.SOLVER.STEPS = (35000, 45000)  # Adjust according to your training schedule
 # ROI Heads settings
 cfg.MODEL.ROI_HEADS.BATCH_SIZE_PER_IMAGE = 128
-cfg.MODEL.ROI_HEADS.NUM_CLASSES = 14  # Number of classes in your dataset (update accordingly)
+cfg.MODEL.ROI_HEADS.NUM_CLASSES = 22  # Number of classes in your dataset (update accordingly)
 # Testing and output settings
 cfg.TEST.EVAL_PERIOD = 1500  # Evaluation period
 cfg.OUTPUT_DIR = "./output"

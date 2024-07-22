@@ -16,4 +16,4 @@ export LD_LIBRARY_PATH=/usr/local/cuda-11.8/lib64${LD_LIBRARY_PATH:+:${LD_LIBRAR
 export CUDA_HOME=/usr/local/cuda-11.8
 
 # Run your script
-srun python src/detectron2/detectron2.py
+srun python src/detectron2/train_detectron2.py

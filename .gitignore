@@ -1,4 +1,5 @@
 venv/
+detectron2/
 data-sample/
 .idea/
 *.png

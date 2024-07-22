@@ -11,6 +11,9 @@
 
 # Activate your virtual environment (if any)
 source /home/ls6/hekalo/Git/xraydetection/venv/bin/activate
+export PATH=/usr/local/cuda-11.8/bin/${PATH:+:${PATH}}
+export LD_LIBRARY_PATH=/usr/local/cuda-11.8/lib64${LD_LIBRARY_PATH:+:${LD_LIBRARY_PATH}}
+export CUDA_HOME=/usr/local/cuda-11.8
 
 # Run your script
 srun python src/detectron2/detectron2.py

@@ -25,15 +25,6 @@ train_dir = os.path.join(image_dir, "train")
 val_dir = os.path.join(image_dir, "val")
 test_dir = os.path.join(image_dir, "test")
 
-# parameters
-model_config = "COCO-Detection/faster_rcnn_R_50_FPN_3x.yaml"
-batch_size = 8
-num_workers = 2
-lr = 0.00025
-max_iter = 50000
-batch_size_per_image = 128
-num_classes = 14
-
 # Register your datasets
 register_coco_instances("vindr_train", {}, train_json, train_dir)
 register_coco_instances("vindr_val", {}, val_json, val_dir)
@@ -43,20 +34,28 @@ register_coco_instances("vindr_test", {}, test_json, test_dir)
 vindr_train_metadata = MetadataCatalog.get("vindr_train")
 dataset_dicts = DatasetCatalog.get("vindr_train")
 
-
 # Set up the configuration
 cfg = get_cfg()
-cfg.merge_from_file(model_zoo.get_config_file(model_config))
+cfg.merge_from_file(model_zoo.get_config_file("COCO-Detection/faster_rcnn_R_50_FPN_3x.yaml"))
+# Dataset settings
 cfg.DATASETS.TRAIN = ("vindr_train",)
 cfg.DATASETS.TEST = ("vindr_val",)
-cfg.TEST.EVAL_PERIOD = 1500
-cfg.DATALOADER.NUM_WORKERS = num_workers
-cfg.MODEL.WEIGHTS = model_zoo.get_checkpoint_url(model_config)  # Use pre-trained weights
-cfg.SOLVER.IMS_PER_BATCH = batch_size
-cfg.SOLVER.BASE_LR = lr  # Learning rate
-cfg.SOLVER.MAX_ITER = max_iter    # Number of iterations
-cfg.MODEL.ROI_HEADS.BATCH_SIZE_PER_IMAGE = batch_size_per_image
-cfg.MODEL.ROI_HEADS.NUM_CLASSES = num_classes  # Number of classes in your dataset (update accordingly)
+cfg.DATALOADER.NUM_WORKERS = 2
+cfg.DATALOADER.FILTER_EMPTY_ANNOTATIONS = False  # include images with no annotations
+# Model weights
+cfg.MODEL.WEIGHTS = model_zoo.get_checkpoint_url("COCO-Detection/faster_rcnn_R_50_FPN_3x.yaml")  # Use pre-trained weights
+# Solver settings
+cfg.SOLVER.IMS_PER_BATCH = 8
+cfg.SOLVER.BASE_LR = 0.00025  # Learning rate
+cfg.SOLVER.MAX_ITER = 50000    # Number of iterations
+# Ensure SOLVER.STEPS are within the range of 0 to SOLVER.MAX_ITER
+cfg.SOLVER.STEPS = (35000, 45000)  # Adjust according to your training schedule
+# ROI Heads settings
+cfg.MODEL.ROI_HEADS.BATCH_SIZE_PER_IMAGE = 128
+cfg.MODEL.ROI_HEADS.NUM_CLASSES = 14  # Number of classes in your dataset (update accordingly)
+# Testing and output settings
+cfg.TEST.EVAL_PERIOD = 1500  # Evaluation period
+cfg.OUTPUT_DIR = "./output"
 
 os.makedirs(cfg.OUTPUT_DIR, exist_ok=True)
 

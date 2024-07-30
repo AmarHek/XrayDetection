@@ -1,14 +1,25 @@
-from ultralytics import YOLO
 import os
+import glob
 
-data_config = "/scratch/hekalo/Datasets/vindr/dataset/yolo_config.yaml"
+def check_dataset_integrity(image_dir, label_dir):
+    images = glob.glob(os.path.join(image_dir, '*.png'))
+    missing_labels = []
 
-# Load the model
-model = YOLO("yolov8l.pt")
+    for img_path in images:
+        label_path = os.path.join(label_dir, os.path.basename(img_path).replace('.png', '.txt'))
+        if not os.path.exists(label_path):
+            missing_labels.append(label_path)
 
-# Load the dataset
-data = model.load_data(data_config)
+    if missing_labels:
+        print(f"Missing labels for {len(missing_labels)} images:")
+        for lbl in missing_labels:
+            print(lbl)
+    else:
+        print("All images have corresponding labels.")
 
-# Check the number of images and labels loaded
-print("Training images:", len(data['train']))
-print("Validation images:", len(data['val']))
+
+# Paths to your train images and labels
+train_image_dir = '/scratch/hekalo/Datasets/vindr/dataset/images/train'
+train_label_dir = '/scratch/hekalo/Datasets/vindr/dataset/labels/train'
+
+check_dataset_integrity(train_image_dir, train_label_dir)
